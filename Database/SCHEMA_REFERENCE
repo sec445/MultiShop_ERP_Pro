@@ -1,0 +1,21 @@
+# Core Table Reference
+
+The installer creates the following core tables.
+
+- `tblShops`: branch master.
+- `tblUsers`: application users and role labels.
+- `tblCategories`: product categories.
+- `tblProducts`: product master, SKU/barcode, cost/selling prices, reorder level.
+- `tblCustomers`: customer master and credit limit.
+- `tblSuppliers`: supplier master.
+- `tblStock`: quantity by shop and product.
+- `tblPurchases`, `tblPurchaseDetails`: purchase headers and lines.
+- `tblSales`, `tblSaleDetails`: sales headers and lines.
+- `tblStockMovements`: auditable inventory movement log.
+- `tblStockTransfers`, `tblStockTransferDetails`: inter-shop transfer.
+- `tblIMEI`: unique mobile IMEI/serial register.
+- `tblPayments`: receipts and payments.
+- `tblExpenses`: shop expenses.
+- `tblAuditLog`: application activity log.
+
+All monetary values use Currency data type (PKR). Dates use Date/Time. Primary keys are AutoNumber. Foreign-key enforcement is intentionally limited in the initial installer so it can be extended without Access relationship conflicts; add and test relationships in Database Tools → Relationships before production.
