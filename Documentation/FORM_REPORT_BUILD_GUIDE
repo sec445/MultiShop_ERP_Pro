@@ -1,0 +1,46 @@
+# Forms, Queries and Reports Build Guide
+
+## Main navigation
+- `frmLogin`: username/password inputs; validate user, set TempVars `UserID`, `UserRole`, `ActiveShopID`.
+- `frmDashboard`: KPI cards and buttons to open modules.
+- `frmShopList`: Record Source `tblShops`.
+- `frmProductList`: Record Source `tblProducts`; filter/search by SKU, barcode, name, category.
+- `frmCustomerList`: Record Source `tblCustomers`.
+- `frmSupplierList`: Record Source `tblSuppliers`.
+- `frmPOS`: unbound product search/barcode box, quantity, cart subform `sfrmPOSLines`, customer selector, totals, payment method, Post Sale button.
+- `frmPurchase`: purchase header with purchase lines subform; Post Purchase button.
+- `frmStock`: shop selector and stock query.
+- `frmStockTransfer`: source shop, destination shop, transfer lines; Dispatch and Receive actions.
+- `frmIMEIRegister`: IMEI, product, shop, purchase reference, status and warranty dates.
+- `frmExpenses`: Record Source `tblExpenses`.
+- `frmUserAdmin`: Record Source `tblUsers`; admin only.
+- `frmReports`: report launcher.
+
+## Required saved queries
+Create queries using SQL View. Refer to `Database/QUERY_CATALOG.md`.
+
+## Reports
+- `rptSalesInvoice`: grouped by SaleID; show invoice number, shop, date, customer, line items, subtotal, discount, tax, grand total, paid and balance.
+- `rptDailySales`: group by date and shop; sum gross, discount, tax and net sales.
+- `rptProductStock`: shop, SKU, product, quantity, reorder level, stock value.
+- `rptLowStock`: products where QtyOnHand <= ReorderLevel.
+- `rptIMEIWarranty`: IMEI, product, customer, sale date, warranty end.
+- `rptCustomerLedger`: opening balance plus sales and receipts.
+- `rptSupplierLedger`: purchases and payments.
+- `rptProfitSummary`: sales less cost of goods sold; exclude expenses unless separately shown.
+- `rptExpenseSummary`: expenses by category, shop and date range.
+- `rptStockTransfer`: transfer document with dispatch/receive status.
+
+## Dashboard KPIs
+Use DSum / DCount only for small datasets; for larger datasets use aggregate saved queries:
+- Today's net sales
+- Month-to-date sales
+- Current stock value
+- Low-stock item count
+- Customer receivables
+- Supplier payables
+- Today's expenses
+
+## Form event pattern
+Set a command button's On Click to `[Event Procedure]`, then use:
+`Private Sub cmdOpenProducts_Click(): DoCmd.OpenForm "frmProductList": End Sub`
