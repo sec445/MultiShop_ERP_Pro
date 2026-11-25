@@ -1,0 +1,54 @@
+Attribute VB_Name = "modUtilities"
+Option Compare Database
+Option Explicit
+
+' CHANGE THIS to your actual UNC backend path.
+Public Const BACKEND_PATH As String = "\\SERVER\MultiShopData\MultiShop_Backend.accdb"
+
+Public Sub LinkBackendTables()
+    On Error GoTo ErrHandler
+    Dim db As DAO.Database, tdf As DAO.TableDef
+    Dim names As Variant, i As Long, p As String
+    Set db = CurrentDb
+    p = BACKEND_PATH
+    If Len(Dir(p)) = 0 Then
+        MsgBox "Backend not found: " & p & vbCrLf & "Update BACKEND_PATH in modUtilities.", vbExclamation
+        Exit Sub
+    End If
+    names = Array("tblShops", "tblUsers", "tblCategories", "tblProducts", "tblCustomers", _
+      "tblSuppliers", "tblStock", "tblPurchases", "tblPurchaseDetails", "tblSales", _
+      "tblSaleDetails", "tblStockMovements", "tblStockTransfers", "tblStockTransferDetails", _
+      "tblIMEI", "tblPayments", "tblExpenses", "tblAuditLog")
+    For i = LBound(names) To UBound(names)
+        On Error Resume Next
+        db.TableDefs.Delete CStr(names(i))
+        On Error GoTo ErrHandler
+        Set tdf = db.CreateTableDef(CStr(names(i)))
+        tdf.Connect = ";DATABASE=" & p
+        tdf.SourceTableName = CStr(names(i))
+        db.TableDefs.Append tdf
+    Next
+    MsgBox "Backend tables linked.", vbInformation
+    Exit Sub
+ErrHandler:
+    MsgBox "Link error " & Err.Number & ": " & Err.Description, vbCritical
+End Sub
+
+Public Sub WriteAudit(ByVal actionName As String, ByVal tableName As String, ByVal recordID As Long, Optional ByVal details As String = "")
+    On Error Resume Next
+    Dim q As String, uid As Long
+    uid = 0
+    If TempVars.Count > 0 Then uid = Nz(TempVars("UserID"), 0)
+    q = "INSERT INTO tblAuditLog (EventDate, UserID, ActionName, TableName, RecordID, Details) " & _
+        "VALUES (Now()," & uid & ",'" & Replace(actionName, "'", "''") & "','" & _
+        Replace(tableName, "'", "''") & "'," & recordID & ",'" & Replace(details, "'", "''") & "')"
+    CurrentDb.Execute q, dbFailOnError
+End Sub
+
+Public Function CurrentShopID() As Long
+    On Error GoTo NoShop
+    CurrentShopID = CLng(TempVars("ActiveShopID"))
+    Exit Function
+NoShop:
+    CurrentShopID = 0
+End Function
